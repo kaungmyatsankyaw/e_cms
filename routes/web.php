@@ -13,6 +13,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('layout.index');
+Route::get('/', 'Auth\LoginController@loginUi');
+
+
+Route::post('/login', 'Auth\LoginController@login');
+
+Route::get('/role/test', 'Auth\RoleController@index');
+
+Route::get('/dashboard', 'Page\IndexController@index')->middleware(['checkAuth', 'checkRole']);
+
+Route::group(['middleware' => ['checkAuth', 'checkRole', 'checkPermission']], function () {
+    Route::get('/shops', 'Shop\IndexController@index');
 });
+
+Route::get('/logout', function () {
+    \Auth::logout();
+    return redirect('/');
+})->name('logout');
